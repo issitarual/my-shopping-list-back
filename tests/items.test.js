@@ -3,11 +3,13 @@ import supertest from 'supertest';
 import app from '../src/app';
 
 beforeEach(async () => {
-    await connection.query(`DELETE FROM items WHERE text = 'teste'`);
+    await connection.query(`INSERT INTO items (text) VALUES ('teste1')`);
   });
 
-afterAll(() => {
-  connection.end();
+afterAll(async () => {
+    await connection.query(`DELETE FROM items WHERE text = 'teste'`);
+    await connection.query(`DELETE FROM items WHERE text = 'teste1'`);
+    connection.end();
 });
 
 describe("POST /items", () => {
@@ -30,7 +32,7 @@ describe("POST /items", () => {
     });
 
     it("returns 400 for invalid params", async () => {
-        const body = { text: 'vela' };
+        const body = { text: 'teste1' };
         const result = await supertest(app).post("/items").send(body);
         expect(result.status).toEqual(400);
     });
